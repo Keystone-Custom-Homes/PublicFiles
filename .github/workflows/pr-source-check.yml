@@ -2,7 +2,7 @@ name: PR Source Validation
 
 on:
   pull_request:
-    branches: [main, master]
+    branches: [main, master, development, dev]
 
 jobs:
   validate-source:
@@ -10,9 +10,25 @@ jobs:
     steps:
       - name: Check PR source branch
         run: |
-          if [[ "${{ github.head_ref }}" != "development" && "${{ github.head_ref }}" != "dev" && ! "${{ github.head_ref }}" =~ ^hotfix/ ]]; then
-            echo "❌ ERROR: PRs to main must originate from development or a hotfix/ branch."
-            echo "Source branch: ${{ github.head_ref }}"
-            exit 1
+          SOURCE="${{ github.head_ref }}"
+          TARGET="${{ github.base_ref }}"
+
+          # PRs to main/master must come from development, dev, or hotfix/
+          if [[ "$TARGET" == "main" || "$TARGET" == "master" ]]; then
+            if [[ "$SOURCE" != "development" && "$SOURCE" != "dev" && ! "$SOURCE" =~ ^hotfix/ ]]; then
+              echo "❌ ERROR: PRs to $TARGET must originate from development, dev, or a hotfix/ branch."
+              echo "Source branch: $SOURCE"
+              exit 1
+            fi
           fi
-          echo "✅ PR source validated: ${{ github.head_ref }}"
+
+          # PRs to development/dev must come from feature/, bugfix/, or hotfix/
+          if [[ "$TARGET" == "development" || "$TARGET" == "dev" ]]; then
+            if [[ ! "$SOURCE" =~ ^(feature/|bugfix/|hotfix/) ]]; then
+              echo "❌ ERROR: PRs to $TARGET must originate from a feature/, bugfix/, or hotfix/ branch."
+              echo "Source branch: $SOURCE"
+              exit 1
+            fi
+          fi
+
+          echo "✅ PR source validated: $SOURCE → $TARGET"
