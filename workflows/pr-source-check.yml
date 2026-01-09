@@ -1,0 +1,18 @@
+name: PR Source Validation
+
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR source branch
+        run: |
+          if [[ "${{ github.head_ref }}" != "development" && "${{ github.head_ref }}" != "dev" && ! "${{ github.head_ref }}" =~ ^hotfix/ ]]; then
+            echo "❌ ERROR: PRs to main must originate from development or a hotfix/ branch."
+            echo "Source branch: ${{ github.head_ref }}"
+            exit 1
+          fi
+          echo "✅ PR source validated: ${{ github.head_ref }}"
