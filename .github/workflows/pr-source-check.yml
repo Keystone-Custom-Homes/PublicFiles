@@ -22,9 +22,9 @@ jobs:
             fi
           fi
 
-          # PRs to development/dev must come from feature/, bugfix/, or hotfix/
+          # PRs to development/dev must come from feature/, bugfix/, refactor/, or hotfix/
           if [[ "$TARGET" == "development" || "$TARGET" == "dev" ]]; then
-            if [[ ! "$SOURCE" =~ ^(feature/|bugfix/|hotfix/) ]]; then
+            if [[ ! "$SOURCE" =~ ^(feature/|bugfix/|hotfix/|refactor/) ]]; then
               echo "❌ ERROR: PRs to $TARGET must originate from a feature/, bugfix/, or hotfix/ branch."
               echo "Source branch: $SOURCE"
               exit 1
